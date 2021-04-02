@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
 
 @ObjectType('Word')
 export class WordType {
@@ -18,3 +18,17 @@ export class WordType {
     tags: string;
 }
 
+@InputType()
+export class createWordParams {
+    @Field()
+    word: string;
+
+    @Field(() => [String])
+    translations: string[];
+
+    @Field(() => [String])
+    examples: string[];
+
+    @Field(() => [String])
+    tags: string;
+}
