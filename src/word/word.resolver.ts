@@ -1,4 +1,4 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Mutation, Query, Resolver } from '@nestjs/graphql';
 import { WordType } from './word.type';
 
 @Resolver(of => WordType)
@@ -14,4 +14,10 @@ export class WordResolver {
             tags: []
         }
     }
+
+    @Mutation(()=> WordType, {name: "create_word"})
+    createWord() {
+        
+    }
+
 }
