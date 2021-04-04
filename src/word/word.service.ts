@@ -25,9 +25,9 @@ export class WordService {
         const {word,examples,tags,translations} = params;
         const newWord = new Word();
         newWord.word = word;
-        newWord.examples = examples || [];
+        newWord.examples = examples;
         newWord.translations= translations;
-        newWord.tags = tags || [];
+        newWord.tags = tags;
         return await this.wordRepository.save(newWord);
     }
 

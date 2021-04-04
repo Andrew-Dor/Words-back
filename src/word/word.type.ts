@@ -26,9 +26,9 @@ export class createWordParams {
     @Field(() => [String])
     translations: string[];
 
-    @Field(() => [String],{nullable:true})
+    @Field(() => [String],{defaultValue:[]})
     examples: string[];
 
-    @Field(() => [String],{nullable:true})
+    @Field(() => [String],{defaultValue:[]})
     tags: string[];
 }
