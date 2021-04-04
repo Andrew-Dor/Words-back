@@ -15,7 +15,7 @@ export class WordType {
     examples: string[];
 
     @Field(() => [String])
-    tags: string;
+    tags: string[];
 }
 
 @InputType()
@@ -26,9 +26,9 @@ export class createWordParams {
     @Field(() => [String])
     translations: string[];
 
-    @Field(() => [String])
+    @Field(() => [String],{nullable:true})
     examples: string[];
 
-    @Field(() => [String])
-    tags: string;
+    @Field(() => [String],{nullable:true})
+    tags: string[];
 }
