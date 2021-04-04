@@ -1,4 +1,5 @@
 import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
+import {IsEmail, MinLength} from "class-validator";
 
 @ObjectType('User')
 export class UserType{
@@ -18,9 +19,11 @@ export class UserType{
 @InputType()
 export class CreateUserParams{
     @Field()
+    @MinLength(4)
     name: string;
 
     @Field()
+    @IsEmail()
     email: string;
 
     @Field()

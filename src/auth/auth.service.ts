@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import { User } from './user.entity';
@@ -12,13 +12,19 @@ export class AuthService {
     ) {}
 
     //new user creation
-    async signUp(params: CreateUserParams):Promise<void> {
-        const {email,name,password} = params;
-        const user = new User();
-        user.name = name;
-        user.password = password;
-        user.email = password;
+    async signUp(params: CreateUserParams):Promise<boolean> {
+        try {
+            const {email,name,password} = params;
+            const user = new User();
+            user.name = name;
+            user.password = password;
+            user.email = password;
+    
+            await this.userRepository.save(user);
+            return true;
+        } catch (err) {
+            throw new InternalServerErrorException();
+        }
 
-        await this.userRepository.save(user);
     }
 }
