@@ -1,6 +1,6 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { WordService } from './word.service';
-import { createWordParams, WordType } from './word.type';
+import { CreateWordParams, WordType } from './word.type';
 
 @Resolver(() => WordType)
 export class WordResolver {
@@ -27,8 +27,8 @@ export class WordResolver {
 
     @Mutation(()=> WordType, {name: "create_word"})
     async createWord(
-        @Args('params', { type: () => createWordParams })
-        params: createWordParams,
+        @Args('params', { type: () => CreateWordParams })
+        params: CreateWordParams,
     ) {
         return await this.wordService.createWord(params);
     }

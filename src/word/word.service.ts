@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import { Word } from './word.entity';
-import { createWordParams } from './word.type';
+import { CreateWordParams } from './word.type';
 import { ObjectID } from "typeorm";
 
 @Injectable()
@@ -21,7 +21,7 @@ export class WordService {
         return await this.wordRepository.find({where:{word:word}});
     }
 
-    async createWord(params: createWordParams):Promise<Word> {
+    async createWord(params: CreateWordParams):Promise<Word> {
         const {word,examples,tags,translations} = params;
         const newWord = new Word();
         newWord.word = word;

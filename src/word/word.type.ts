@@ -19,7 +19,7 @@ export class WordType {
 }
 
 @InputType()
-export class createWordParams {
+export class CreateWordParams {
     @Field()
     word: string;
 
