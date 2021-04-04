@@ -1,17 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MongoRepository } from 'typeorm';
+import { Word } from './word.entity';
 import { createWordParams } from './word.type';
-import { WordRepository } from './words.repository';
+import {v4 as uuid} from "uuid";
 
 @Injectable()
 export class WordService {
     constructor(
-        @InjectRepository(WordRepository)
-        private wordRepository: WordRepository,
+        @InjectRepository(Word)
+        private readonly wordRepository: MongoRepository<Word>,
+
     ) {}
 
-    createWord(params: createWordParams) {
-        const word = this.wordRepository.createWord(params);
+    async getWordById(id:string):Promise<Word> {
+        return await this.wordRepository.findOne(id);
+    }
+
+    async getAllWords(word:string):Promise<Word[]> {
+        return await this.wordRepository.find({where:word})
+    }
+
+    async createWord(params: createWordParams):Promise<Word> {
+        const {word,examples,tags,translations} = params;
+        return await this.wordRepository.create({
+            word,
+            examples,
+            translations,
+            tags,
+        });
     }
 
     // getWordById(id:string)

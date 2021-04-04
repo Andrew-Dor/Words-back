@@ -1,4 +1,4 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { WordService } from './word.service';
 import { createWordParams, WordType } from './word.type';
 
@@ -9,21 +9,21 @@ export class WordResolver {
         private wordService: WordService
     ) {}
 
-    @Query(() => WordType, {name: "get_word"})
-    word() {
-        return {
-            id: "yne18c218yc12",
-            word: "test",
-            translations: ['test'],
-            examples: ["ex"],
-            tags: []
-        }
+    @Query(() => WordType, {name: "getWord"})
+    async getWord(
+        @Args('id', {type: () => ID})
+        id: string,
+    ) {
+        return await this.wordService.getWordById(id);
     }
 
-    // @Mutation(()=> WordType, {name: "create_word"})
-    // createWord(@Args('params', { type: () => String }) {
-
-    // }
+    @Query(() => WordType, {name: "getWordByText"})
+    async getWordByText(
+        @Args('word')
+        word:string,
+    ) {
+        return await this.wordService.getAllWords(word);
+    }
 
     @Mutation(()=> WordType, {name: "create_word"})
     async createWord(

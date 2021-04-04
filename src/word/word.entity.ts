@@ -1,12 +1,14 @@
-import { Column, Entity, ObjectIdColumn, PrimaryColumn } from "typeorm";
+import { Column, Entity, ObjectID, ObjectIdColumn, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class Word {
-    @ObjectIdColumn()
-    _id: string; //mongo db object id
+    // @ObjectIdColumn()
+    // _id: string; //mongo db object id
 
-    @PrimaryColumn()
-    id: string;
+    // @PrimaryColumn()
+    // id: string;
+    @ObjectIdColumn()
+    id: ObjectID;
 
     @Column()
     word: string;

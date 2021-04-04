@@ -10,6 +10,7 @@ import { WordModule } from './word/word.module';
     TypeOrmModule.forRoot({
       type: 'mongodb',
       url: 'mongodb://localhost/words',
+      database: 'words',
       synchronize: true,
       useUnifiedTopology: true,
       entities: [

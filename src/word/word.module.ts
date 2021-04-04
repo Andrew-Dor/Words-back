@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Word } from './word.entity';
 import { WordResolver } from './word.resolver';
 import { WordService } from './word.service';
-import { WordRepository } from './words.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([WordRepository])
+    TypeOrmModule.forFeature([Word])
   ],
   providers: [
     WordResolver, 
