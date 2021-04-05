@@ -35,3 +35,14 @@ export class CreateUserParams{
     @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,{message: "Password too weak!"})
     password: string;
 }
+
+@InputType()
+export class SignInParams {
+    @Field()
+    @IsEmail()
+    email: string;
+
+    @Field()
+    @IsString()
+    password: string;
+}

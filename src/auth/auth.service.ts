@@ -1,8 +1,9 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserParams } from './user.type';
+import { CreateUserParams, SignInParams } from './user.type';
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
@@ -11,17 +12,17 @@ export class AuthService {
         private readonly userRepository: MongoRepository<User>,
     ) { }
 
-    // async getUserByEmail(email:string):Promise<User> {
-    //     return await this.userRepository.findOne({email});
-    // }
+    private async hashPassword(password:string): Promise<string> {
+        const salt = await bcrypt.genSalt();
+        return bcrypt.hash(password,salt);
+    }
 
-    //new user creation
     async signUp(params: CreateUserParams): Promise<boolean> {
         const { email, name, password } = params;
 
         const user = new User();
         user.name = name;
-        user.password = password;
+        user.password = await this.hashPassword(password);
         user.email = email;
 
         try {
@@ -34,6 +35,24 @@ export class AuthService {
                 throw new InternalServerErrorException();
             }
         }
+    }
+
+    async signIn(params: SignInParams):Promise<string> {
+        const username = await this.validateUserPassword(params);
+        if(!username){
+            throw new UnauthorizedException('Invalid email or password');
+        }
+        return username;
+    }
+
+    async validateUserPassword(params: SignInParams):Promise<string> {
+        const { email, password } = params;
+        const user = await this.userRepository.findOne({email});
+
+        if(user && await user.validatePassword(password)){
+            return user.name;
+        }
+        return null;
     }
 
 }

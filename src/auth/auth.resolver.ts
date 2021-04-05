@@ -1,6 +1,6 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { CreateUserParams, UserType } from './user.type';
+import { CreateUserParams, SignInParams, UserType } from './user.type';
 
 @Resolver(() => UserType)
 export class AuthResolver {
@@ -14,5 +14,13 @@ export class AuthResolver {
         params: CreateUserParams,
     ) {
         return await this.authService.signUp(params);
+    }
+
+    @Query(()=>String, {name: "signIn"})
+    async signIn(
+        @Args('params', {type: () => SignInParams})
+        params: SignInParams
+    ) {
+        return await this.authService.signIn(params);
     }
 }
