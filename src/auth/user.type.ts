@@ -46,3 +46,10 @@ export class SignInParams {
     @IsString()
     password: string;
 }
+
+@ObjectType()
+export class AccessTokenObject {
+    @Field()
+    accessToken: string;
+}
+

@@ -2,14 +2,17 @@ import { ConflictException, Injectable, InternalServerErrorException, Unauthoriz
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import { User } from './user.entity';
-import { CreateUserParams, SignInParams } from './user.type';
+import { AccessTokenObject, CreateUserParams, SignInParams } from './user.type';
 import * as bcrypt from "bcrypt";
+import {ErrorCodes} from "src/utils/constants";
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: MongoRepository<User>,
+        private jwtService:JwtService,
     ) { }
 
     private async hashPassword(password:string): Promise<string> {
@@ -29,7 +32,7 @@ export class AuthService {
             await this.userRepository.save(user);
             return true;
         } catch (error) {
-            if (error.code === 11000) {
+            if (error.code === ErrorCodes.DUPLICATE_USER) {
                 throw new ConflictException('This email has already exists!');
             } else {
                 throw new InternalServerErrorException();
@@ -37,12 +40,17 @@ export class AuthService {
         }
     }
 
-    async signIn(params: SignInParams):Promise<string> {
+    async signIn(params: SignInParams): Promise<AccessTokenObject> {
         const username = await this.validateUserPassword(params);
         if(!username){
             throw new UnauthorizedException('Invalid email or password');
         }
-        return username;
+
+        const payload = {username, email:params.email};
+        const accessToken = await this.jwtService.sign(payload);
+
+        return { accessToken };
+        // return username;
     }
 
     async validateUserPassword(params: SignInParams):Promise<string> {
