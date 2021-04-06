@@ -1,3 +1,3 @@
 export enum ErrorCodes {
-    DUPLICATE_USER = 11000
-};
+    DUPLICATE_USER = 11000,
+}

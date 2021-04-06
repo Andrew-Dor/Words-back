@@ -6,13 +6,7 @@ import { WordResolver } from './word.resolver';
 import { WordService } from './word.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Word]),
-    AuthModule,
-  ],
-  providers: [
-    WordResolver, 
-    WordService
-  ]
+    imports: [TypeOrmModule.forFeature([Word]), AuthModule],
+    providers: [WordResolver, WordService],
 })
 export class WordModule {}

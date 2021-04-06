@@ -1,5 +1,5 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
-import * as bcrypt from "bcrypt";
+import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -9,13 +9,13 @@ export class User {
     @Column()
     name: string;
 
-    @Column({unique: true})
+    @Column({ unique: true })
     email: string;
 
     @Column()
     password: string;
 
-    async validatePassword(password:string):Promise<boolean> {
-        return bcrypt.compare(password,this.password);
+    async validatePassword(password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.password);
     }
 }

@@ -1,9 +1,15 @@
-import { Field, ID, InputType, ObjectType } from "@nestjs/graphql";
-import {IsEmail, IsString, Matches, MaxLength, MinLength} from "class-validator";
+import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
+import {
+    IsEmail,
+    IsString,
+    Matches,
+    MaxLength,
+    MinLength,
+} from 'class-validator';
 
 @ObjectType('User')
-export class UserType{
-    @Field(()=>ID)
+export class UserType {
+    @Field(() => ID)
     id: string;
 
     @Field()
@@ -17,7 +23,7 @@ export class UserType{
 }
 
 @InputType()
-export class CreateUserParams{
+export class CreateUserParams {
     @Field()
     @IsString()
     @MinLength(4)
@@ -32,7 +38,9 @@ export class CreateUserParams{
     @IsString()
     @MinLength(8)
     @MaxLength(20)
-    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,{message: "Password too weak!"})
+    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+        message: 'Password too weak!',
+    })
     password: string;
 }
 
@@ -52,4 +60,3 @@ export class AccessTokenObject {
     @Field()
     accessToken: string;
 }
-

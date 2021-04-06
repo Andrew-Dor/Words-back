@@ -1,10 +1,15 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+    ConflictException,
+    Injectable,
+    InternalServerErrorException,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoRepository } from 'typeorm';
 import { User } from './user.entity';
 import { AccessTokenObject, CreateUserParams, SignInParams } from './user.type';
-import * as bcrypt from "bcrypt";
-import {ErrorCodes} from "src/utils/constants";
+import * as bcrypt from 'bcrypt';
+import { ErrorCodes } from 'src/utils/constants';
 import { JwtService } from '@nestjs/jwt';
 import { IJwtPayload } from './auth.types';
 
@@ -13,12 +18,12 @@ export class AuthService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: MongoRepository<User>,
-        private jwtService:JwtService,
-    ) { }
+        private jwtService: JwtService,
+    ) {}
 
-    private async hashPassword(password:string): Promise<string> {
+    private async hashPassword(password: string): Promise<string> {
         const salt = await bcrypt.genSalt();
-        return bcrypt.hash(password,salt);
+        return bcrypt.hash(password, salt);
     }
 
     async signUp(params: CreateUserParams): Promise<boolean> {
@@ -43,24 +48,23 @@ export class AuthService {
 
     async signIn(params: SignInParams): Promise<AccessTokenObject> {
         const username = await this.validateUserPassword(params);
-        if(!username){
+        if (!username) {
             throw new UnauthorizedException('Invalid email or password');
         }
 
-        const payload: IJwtPayload = {username, email:params.email};
+        const payload: IJwtPayload = { username, email: params.email };
         const accessToken = await this.jwtService.sign(payload);
 
         return { accessToken };
     }
 
-    async validateUserPassword(params: SignInParams):Promise<string> {
+    async validateUserPassword(params: SignInParams): Promise<string> {
         const { email, password } = params;
-        const user = await this.userRepository.findOne({email});
+        const user = await this.userRepository.findOne({ email });
 
-        if(user && await user.validatePassword(password)){
+        if (user && (await user.validatePassword(password))) {
             return user.name;
         }
         return null;
     }
-
 }
