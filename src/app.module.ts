@@ -23,6 +23,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: true,
+      context: ({req}) => ({req}),
     }),
     AuthModule,
     WordModule
