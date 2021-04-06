@@ -1,8 +1,11 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { WordService } from './word.service';
 import { CreateWordParams, WordType } from './word.type';
 
 @Resolver(() => WordType)
+@UseGuards(JwtAuthGuard)
 export class WordResolver {
 
     constructor(

@@ -6,6 +6,7 @@ import { AccessTokenObject, CreateUserParams, SignInParams } from './user.type';
 import * as bcrypt from "bcrypt";
 import {ErrorCodes} from "src/utils/constants";
 import { JwtService } from '@nestjs/jwt';
+import { IJwtPayload } from './auth.types';
 
 @Injectable()
 export class AuthService {
@@ -46,11 +47,10 @@ export class AuthService {
             throw new UnauthorizedException('Invalid email or password');
         }
 
-        const payload = {username, email:params.email};
+        const payload: IJwtPayload = {username, email:params.email};
         const accessToken = await this.jwtService.sign(payload);
 
         return { accessToken };
-        // return username;
     }
 
     async validateUserPassword(params: SignInParams):Promise<string> {
