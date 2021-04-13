@@ -6,21 +6,30 @@ import {
     MaxLength,
     MinLength,
 } from 'class-validator';
+import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
+import {Document, Schema as MongooseSchema} from "mongoose";
 
-@ObjectType('User')
-export class UserType {
+@ObjectType()
+@Schema()
+export class User {
     @Field(() => ID)
-    id: string;
+    _id: MongooseSchema.Types.ObjectId;
 
     @Field()
+    @Prop()
     name: string;
 
     @Field()
+    @Prop({unique:true})
     email: string;
 
     @Field()
+    @Prop()
     password: string;
 }
+
+export type UserDocument = User & Document;
+export const UserSchema = SchemaFactory.createForClass(User);
 
 @InputType()
 export class CreateUserParams {

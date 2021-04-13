@@ -4,20 +4,18 @@ import {
     InternalServerErrorException,
     UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { MongoRepository } from 'typeorm';
-import { User } from './user.entity';
-import { AccessTokenObject, CreateUserParams, SignInParams } from './user.type';
+import { AccessTokenObject, CreateUserParams, SignInParams, User, UserDocument } from './user.type';
 import * as bcrypt from 'bcrypt';
 import { ErrorCodes } from 'src/utils/constants';
 import { JwtService } from '@nestjs/jwt';
 import { IJwtPayload } from './auth.types';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthService {
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: MongoRepository<User>,
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
         private jwtService: JwtService,
     ) {}
 
@@ -26,16 +24,21 @@ export class AuthService {
         return bcrypt.hash(password, salt);
     }
 
+    private async validatePassword(inputPassword: string, userPassword: string): Promise<boolean> {
+        return bcrypt.compare(inputPassword, userPassword);
+    }
+
     async signUp(params: CreateUserParams): Promise<boolean> {
         const { email, name, password } = params;
-
-        const user = new User();
-        user.name = name;
-        user.password = await this.hashPassword(password);
-        user.email = email;
+        const hashedPassword = await this.hashPassword(password);
+        const newUser = new this.userModel({
+            email,
+            name,
+            password: hashedPassword
+        });
 
         try {
-            await this.userRepository.save(user);
+            await newUser.save();
             return true;
         } catch (error) {
             if (error.code === ErrorCodes.DUPLICATE_USER) {
@@ -44,6 +47,22 @@ export class AuthService {
                 throw new InternalServerErrorException();
             }
         }
+
+        // const user = new User();
+        // user.name = name;
+        // user.password = await this.hashPassword(password);
+        // user.email = email;
+
+        // try {
+        //     await this.userRepository.save(user);
+        //     return true;
+        // } catch (error) {
+        //     if (error.code === ErrorCodes.DUPLICATE_USER) {
+        //         throw new ConflictException('This email has already exists!');
+        //     } else {
+        //         throw new InternalServerErrorException();
+        //     }
+        // }
     }
 
     async signIn(params: SignInParams): Promise<AccessTokenObject> {
@@ -60,9 +79,9 @@ export class AuthService {
 
     async validateUserPassword(params: SignInParams): Promise<string> {
         const { email, password } = params;
-        const user = await this.userRepository.findOne({ email });
+        const user = await this.userModel.findOne({email});
 
-        if (user && (await user.validatePassword(password))) {
+        if (user && (await this.validatePassword(password,user.password))) {
             return user.name;
         }
         return null;
