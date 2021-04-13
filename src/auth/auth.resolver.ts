@@ -4,10 +4,10 @@ import {
     AccessTokenObject,
     CreateUserParams,
     SignInParams,
-    UserType,
+    User,
 } from './user.type';
 
-@Resolver(() => UserType)
+@Resolver(() => User)
 export class AuthResolver {
     constructor(private authService: AuthService) {}
 
