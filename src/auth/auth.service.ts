@@ -47,22 +47,6 @@ export class AuthService {
                 throw new InternalServerErrorException();
             }
         }
-
-        // const user = new User();
-        // user.name = name;
-        // user.password = await this.hashPassword(password);
-        // user.email = email;
-
-        // try {
-        //     await this.userRepository.save(user);
-        //     return true;
-        // } catch (error) {
-        //     if (error.code === ErrorCodes.DUPLICATE_USER) {
-        //         throw new ConflictException('This email has already exists!');
-        //     } else {
-        //         throw new InternalServerErrorException();
-        //     }
-        // }
     }
 
     async signIn(params: SignInParams): Promise<AccessTokenObject> {

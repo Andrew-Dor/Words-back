@@ -10,6 +10,7 @@ import {MongooseModule} from "@nestjs/mongoose";
         ConfigModule.forRoot({}),
         MongooseModule.forRoot(
             `mongodb://${process.env.DB_HOST}/${process.env.DB_NAME}`,
+            {useCreateIndex: true},
         ),
         GraphQLModule.forRoot({
             autoSchemaFile: true,
