@@ -20,10 +20,12 @@ import { User, UserSchema } from './user.type';
                 expiresIn: 3600,
             },
         }),
-        MongooseModule.forFeature([{
-            name: User.name,
-            schema: UserSchema,
-        }])
+        MongooseModule.forFeature([
+            {
+                name: User.name,
+                schema: UserSchema,
+            },
+        ]),
     ],
     providers: [AuthResolver, AuthService, JwtStrategy],
     exports: [JwtStrategy, PassportModule],

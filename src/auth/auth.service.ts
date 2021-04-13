@@ -4,7 +4,13 @@ import {
     InternalServerErrorException,
     UnauthorizedException,
 } from '@nestjs/common';
-import { AccessTokenObject, CreateUserParams, SignInParams, User, UserDocument } from './user.type';
+import {
+    AccessTokenObject,
+    CreateUserParams,
+    SignInParams,
+    User,
+    UserDocument,
+} from './user.type';
 import * as bcrypt from 'bcrypt';
 import { ErrorCodes } from 'src/utils/constants';
 import { JwtService } from '@nestjs/jwt';
@@ -24,7 +30,10 @@ export class AuthService {
         return bcrypt.hash(password, salt);
     }
 
-    private async validatePassword(inputPassword: string, userPassword: string): Promise<boolean> {
+    private async validatePassword(
+        inputPassword: string,
+        userPassword: string,
+    ): Promise<boolean> {
         return bcrypt.compare(inputPassword, userPassword);
     }
 
@@ -34,7 +43,7 @@ export class AuthService {
         const newUser = new this.userModel({
             email,
             name,
-            password: hashedPassword
+            password: hashedPassword,
         });
 
         try {
@@ -63,9 +72,9 @@ export class AuthService {
 
     async validateUserPassword(params: SignInParams): Promise<string> {
         const { email, password } = params;
-        const user = await this.userModel.findOne({email});
+        const user = await this.userModel.findOne({ email });
 
-        if (user && (await this.validatePassword(password,user.password))) {
+        if (user && (await this.validatePassword(password, user.password))) {
             return user.name;
         }
         return null;

@@ -6,8 +6,8 @@ import {
     MaxLength,
     MinLength,
 } from 'class-validator';
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import {Document, Schema as MongooseSchema} from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 @ObjectType()
 @Schema()
@@ -20,7 +20,7 @@ export class User {
     name: string;
 
     @Field()
-    @Prop({unique:true})
+    @Prop({ unique: true })
     email: string;
 
     @Field()
