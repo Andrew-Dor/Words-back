@@ -1,0 +1,23 @@
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { ObjectID } from 'mongodb';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { GetUserId } from 'src/utils/decorators/get-user-id.decorator';
+import { CreateDictionaryParams, Dictionary } from './dictionary.model';
+import { DictionaryService } from './dictionary.service';
+
+@Resolver(()=>Dictionary)
+@UseGuards(JwtAuthGuard)
+export class DictionaryResolver {
+    constructor(private dictionaryService: DictionaryService) { }
+
+    @Mutation(() => Dictionary, { name: 'createDictionary' })
+    async createDictionary(
+        @Args('params', { type: () => CreateDictionaryParams })
+        params: CreateDictionaryParams,
+        @GetUserId()
+        userId: ObjectID,
+    ) {
+        return await this.dictionaryService.createDictionary(params, userId);
+    }
+}
