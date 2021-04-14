@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
 import { ObjectID } from 'mongodb';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { GetUserId } from 'src/utils/decorators/get-user-id.decorator';
@@ -39,5 +39,15 @@ export class DictionaryResolver {
         userId: string,
     ) {
         return await this.dictionaryService.updateDictionary(params,userId);
+    }
+
+    @Query(() => Dictionary, { name: 'getDictionaryById' })
+    async getDictionaryById(
+        @Args('id', { type: () => ID })
+        id: string,
+        @GetUserId()
+        userId: string,
+    ) {
+        return await this.dictionaryService.getDictionaryById(id,userId);
     }
 }

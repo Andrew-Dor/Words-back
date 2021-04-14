@@ -14,6 +14,10 @@ export class DictionaryService {
         return userId === ownerId;
     }
 
+    private hasEditRights(userId: string, ownerId: string, contributors: string[]): boolean {
+        return (userId === ownerId) || contributors.includes(userId);
+    }
+
     private async getDictionaryData(id: string): Promise<Dictionary> {
         const dictionary = await this.dictionaryModel.findById(id);
 
@@ -68,6 +72,16 @@ export class DictionaryService {
             {
                 new: true,
             })
+    }
+
+    async getDictionaryById(id:string, userId:string):Promise<Dictionary> {
+        const dictionary = await this.getDictionaryData(id);
+        const { ownerId, contributors, type } = dictionary;
+        if (!this.hasEditRights(userId, ownerId, contributors) && type !== "PUBLIC") {
+            throw new ForbiddenException('Access denied');
+        }
+
+        return dictionary;
     }
 
 }
