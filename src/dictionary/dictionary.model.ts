@@ -72,3 +72,21 @@ export class CreateDictionaryParams {
     @Field(() => VisibilityType)
     type: VisibilityType;
 }
+
+@InputType() 
+export class DictionaryIdParams {
+    @Field()
+    dictionaryId: string;
+}
+
+@InputType() 
+export class UpdateDictionaryParams extends DictionaryIdParams{
+    @Field({nullable:true})
+    name: string;
+
+    @Field({nullable:true})
+    description: string;
+
+    @Field(() => VisibilityType, {nullable: true})
+    type: VisibilityType;
+}

@@ -1,15 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateDictionaryParams, Dictionary, DictionaryDocument } from './dictionary.model';
+import { CreateDictionaryParams, Dictionary, DictionaryDocument, UpdateDictionaryParams } from './dictionary.model';
 import { Model } from 'mongoose';
-import { UserDocument } from 'src/auth/user.type';
 import { ObjectID } from 'mongodb';
 
 @Injectable()
 export class DictionaryService {
     constructor(
         @InjectModel(Dictionary.name) private dictionaryModel: Model<DictionaryDocument>,
-    ) {}
+    ) { }
 
     private isOwner(userId: string, ownerId: string): boolean {
         return userId === ownerId;
@@ -32,8 +31,8 @@ export class DictionaryService {
             description,
             type,
             ownerId: userId.toString(),
-            words:[],
-            contributors:[],
+            words: [],
+            contributors: [],
             createdAt: Date.now()
         });
         return await newDictionary.save();
@@ -47,9 +46,28 @@ export class DictionaryService {
             throw new ForbiddenException('Access denied');
         }
 
-        await this.dictionaryModel.deleteOne({_id: id});
+        await this.dictionaryModel.deleteOne({ _id: id });
         return true;
     }
 
-    
+    async updateDictionary(params: UpdateDictionaryParams, userId: string): Promise<Dictionary> {
+        const { dictionaryId, name, description, type } = params;
+        const dictionary = await this.getDictionaryData(dictionaryId);
+
+        if (!this.isOwner(userId, dictionary.ownerId)) {
+            throw new ForbiddenException('Access denied');
+        }
+
+        return await this.dictionaryModel.findByIdAndUpdate(
+            dictionaryId,
+            {
+                name: name || dictionary.name,
+                description: description || dictionary.description,
+                type: type || dictionary.type,
+            },
+            {
+                new: true,
+            })
+    }
+
 }
