@@ -1,21 +1,39 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    ConflictException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AddWordParams, ContributorParams, CreateDictionaryParams, Dictionary, DictionaryDocument, RemoveWordParams, UpdateDictionaryParams } from './dictionary.model';
+import {
+    AddWordParams,
+    ContributorParams,
+    CreateDictionaryParams,
+    Dictionary,
+    DictionaryDocument,
+    RemoveWordParams,
+    UpdateDictionaryParams,
+} from './dictionary.model';
 import { Model } from 'mongoose';
 import { ObjectID } from 'mongodb';
 
 @Injectable()
 export class DictionaryService {
     constructor(
-        @InjectModel(Dictionary.name) private dictionaryModel: Model<DictionaryDocument>,
-    ) { }
+        @InjectModel(Dictionary.name)
+        private dictionaryModel: Model<DictionaryDocument>,
+    ) {}
 
     private isOwner(userId: string, ownerId: string): boolean {
         return userId === ownerId;
     }
 
-    private hasEditRights(userId: string, ownerId: string, contributors: string[]): boolean {
-        return (userId === ownerId) || contributors.includes(userId);
+    private hasEditRights(
+        userId: string,
+        ownerId: string,
+        contributors: string[],
+    ): boolean {
+        return userId === ownerId || contributors.includes(userId);
     }
 
     private async getDictionaryData(id: string): Promise<DictionaryDocument> {
@@ -37,7 +55,7 @@ export class DictionaryService {
             ownerId: userId.toString(),
             words: [],
             contributors: [],
-            createdAt: Date.now()
+            createdAt: Date.now(),
         });
         return await newDictionary.save();
     }
@@ -54,7 +72,10 @@ export class DictionaryService {
         return true;
     }
 
-    async updateDictionary(params: UpdateDictionaryParams, userId: string): Promise<Dictionary> {
+    async updateDictionary(
+        params: UpdateDictionaryParams,
+        userId: string,
+    ): Promise<Dictionary> {
         const { dictionaryId, name, description, type } = params;
         const dictionary = await this.getDictionaryData(dictionaryId);
 
@@ -71,21 +92,25 @@ export class DictionaryService {
             },
             {
                 new: true,
-            })
+            },
+        );
     }
 
-    async getDictionaryById(id:string, userId:string):Promise<Dictionary> {
+    async getDictionaryById(id: string, userId: string): Promise<Dictionary> {
         const dictionary = await this.getDictionaryData(id);
         const { ownerId, contributors, type } = dictionary;
-        if (!this.hasEditRights(userId, ownerId, contributors) && type !== "PUBLIC") {
+        if (
+            !this.hasEditRights(userId, ownerId, contributors) &&
+            type !== 'PUBLIC'
+        ) {
             throw new ForbiddenException('Access denied');
         }
 
         return dictionary;
     }
 
-    async addWord(params:AddWordParams, userId: string):Promise<Dictionary> {
-        const {dictionaryId,examples,tags,translations,word} = params;
+    async addWord(params: AddWordParams, userId: string): Promise<Dictionary> {
+        const { dictionaryId, examples, tags, translations, word } = params;
         const dictionary = await this.getDictionaryData(dictionaryId);
         const { ownerId, contributors } = dictionary;
 
@@ -93,22 +118,27 @@ export class DictionaryService {
             throw new ForbiddenException('Access denied');
         }
 
-        if(dictionary.words.find(w => w.word === word)) {
-            throw new ConflictException('This word has already exists in the dictionary!');
+        if (dictionary.words.find((w) => w.word === word)) {
+            throw new ConflictException(
+                'This word has already exists in the dictionary!',
+            );
         }
 
         dictionary.words.push({
             word,
             translations,
             examples,
-            tags
+            tags,
         });
 
         return await dictionary.save();
     }
 
-    async removeWord(params: RemoveWordParams, userId:string):Promise<Dictionary> {
-        const {dictionaryId,word} = params;
+    async removeWord(
+        params: RemoveWordParams,
+        userId: string,
+    ): Promise<Dictionary> {
+        const { dictionaryId, word } = params;
         const dictionary = await this.getDictionaryData(dictionaryId);
         const { ownerId, contributors } = dictionary;
 
@@ -116,38 +146,47 @@ export class DictionaryService {
             throw new ForbiddenException('Access denied');
         }
 
-        dictionary.words = dictionary.words.filter(w => w.word!==word);
+        dictionary.words = dictionary.words.filter((w) => w.word !== word);
 
         return await dictionary.save();
     }
 
-    async addContributor(params: ContributorParams, userId: string): Promise<Dictionary> {
-        const {dictionaryId,contributorId} = params;
+    async addContributor(
+        params: ContributorParams,
+        userId: string,
+    ): Promise<Dictionary> {
+        const { dictionaryId, contributorId } = params;
         const dictionary = await this.getDictionaryData(dictionaryId);
 
         if (!this.isOwner(userId, dictionary.ownerId)) {
             throw new ForbiddenException('Access denied');
         }
 
-        if(dictionary.contributors.find(c => c === contributorId)) {
-            throw new ConflictException('This user is already a contributor of this dictionary!');
+        if (dictionary.contributors.find((c) => c === contributorId)) {
+            throw new ConflictException(
+                'This user is already a contributor of this dictionary!',
+            );
         }
 
         dictionary.contributors.push(contributorId);
         return await dictionary.save();
     }
 
-    async removeContributor(params: ContributorParams, userId: string): Promise<Dictionary> {
-        const {dictionaryId,contributorId} = params;
+    async removeContributor(
+        params: ContributorParams,
+        userId: string,
+    ): Promise<Dictionary> {
+        const { dictionaryId, contributorId } = params;
         const dictionary = await this.getDictionaryData(dictionaryId);
 
         if (!this.isOwner(userId, dictionary.ownerId)) {
             throw new ForbiddenException('Access denied');
         }
 
-        dictionary.contributors = dictionary.contributors.filter(c => c !== contributorId);
+        dictionary.contributors = dictionary.contributors.filter(
+            (c) => c !== contributorId,
+        );
 
         return await dictionary.save();
     }
-
 }

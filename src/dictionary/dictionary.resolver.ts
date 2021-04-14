@@ -3,13 +3,20 @@ import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
 import { ObjectID } from 'mongodb';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { GetUserId } from 'src/utils/decorators/get-user-id.decorator';
-import { AddWordParams, ContributorParams, CreateDictionaryParams, Dictionary, RemoveWordParams, UpdateDictionaryParams } from './dictionary.model';
+import {
+    AddWordParams,
+    ContributorParams,
+    CreateDictionaryParams,
+    Dictionary,
+    RemoveWordParams,
+    UpdateDictionaryParams,
+} from './dictionary.model';
 import { DictionaryService } from './dictionary.service';
 
-@Resolver(()=>Dictionary)
+@Resolver(() => Dictionary)
 @UseGuards(JwtAuthGuard)
 export class DictionaryResolver {
-    constructor(private dictionaryService: DictionaryService) { }
+    constructor(private dictionaryService: DictionaryService) {}
 
     @Mutation(() => Dictionary, { name: 'createDictionary' })
     async createDictionary(
@@ -28,7 +35,7 @@ export class DictionaryResolver {
         @GetUserId()
         userId: string,
     ) {
-        return await this.dictionaryService.removeDictionary(id,userId);
+        return await this.dictionaryService.removeDictionary(id, userId);
     }
 
     @Mutation(() => Dictionary, { name: 'updateDictionary' })
@@ -38,7 +45,7 @@ export class DictionaryResolver {
         @GetUserId()
         userId: string,
     ) {
-        return await this.dictionaryService.updateDictionary(params,userId);
+        return await this.dictionaryService.updateDictionary(params, userId);
     }
 
     @Query(() => Dictionary, { name: 'getDictionaryById' })
@@ -48,46 +55,46 @@ export class DictionaryResolver {
         @GetUserId()
         userId: string,
     ) {
-        return await this.dictionaryService.getDictionaryById(id,userId);
+        return await this.dictionaryService.getDictionaryById(id, userId);
     }
 
-    @Mutation(() => Dictionary, {name: 'addWord'})
+    @Mutation(() => Dictionary, { name: 'addWord' })
     async addWord(
-        @Args('params', {type: () => AddWordParams})
+        @Args('params', { type: () => AddWordParams })
         params: AddWordParams,
         @GetUserId()
         userId: string,
     ) {
-        return await this.dictionaryService.addWord(params,userId);
+        return await this.dictionaryService.addWord(params, userId);
     }
 
-    @Mutation(() => Dictionary, {name: 'removeWord'})
+    @Mutation(() => Dictionary, { name: 'removeWord' })
     async removeWord(
-        @Args('params', {type: () => RemoveWordParams})
+        @Args('params', { type: () => RemoveWordParams })
         params: RemoveWordParams,
         @GetUserId()
         userId: string,
     ) {
-        return await this.dictionaryService.removeWord(params,userId);
+        return await this.dictionaryService.removeWord(params, userId);
     }
 
-    @Mutation(() => Dictionary, {name: 'addContributor'})
+    @Mutation(() => Dictionary, { name: 'addContributor' })
     async addContributor(
-        @Args('params', {type: () => ContributorParams})
+        @Args('params', { type: () => ContributorParams })
         params: ContributorParams,
         @GetUserId()
         userId: string,
     ) {
-        return await this.dictionaryService.addContributor(params,userId);
+        return await this.dictionaryService.addContributor(params, userId);
     }
 
-    @Mutation(() => Dictionary, {name: 'removeContributor'})
+    @Mutation(() => Dictionary, { name: 'removeContributor' })
     async removeContributor(
-        @Args('params', {type: () => ContributorParams})
+        @Args('params', { type: () => ContributorParams })
         params: ContributorParams,
         @GetUserId()
         userId: string,
     ) {
-        return await this.dictionaryService.removeContributor(params,userId);
+        return await this.dictionaryService.removeContributor(params, userId);
     }
 }

@@ -3,6 +3,6 @@ export enum ErrorCodes {
 }
 
 export enum VisibilityType {
-    PUBLIC = "PUBLIC",
-    PRIVATE = "PRIVATE"
+    PUBLIC = 'PUBLIC',
+    PRIVATE = 'PRIVATE',
 }

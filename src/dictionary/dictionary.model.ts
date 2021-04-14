@@ -1,4 +1,11 @@
-import { Field, ID, InputType, ObjectType, registerEnumType, Int } from '@nestjs/graphql';
+import {
+    Field,
+    ID,
+    InputType,
+    ObjectType,
+    registerEnumType,
+    Int,
+} from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { VisibilityType } from 'src/utils/constants';
@@ -9,7 +16,6 @@ registerEnumType(VisibilityType, {
 
 @ObjectType()
 export class Word {
-
     @Field()
     word: string;
 
@@ -53,7 +59,7 @@ export class Dictionary {
     @Prop([String])
     contributors: string[];
 
-    @Field(()=> Int)
+    @Field(() => Int)
     @Prop()
     createdAt: number;
 }
@@ -73,21 +79,21 @@ export class CreateDictionaryParams {
     type: VisibilityType;
 }
 
-@InputType() 
+@InputType()
 export class DictionaryIdParams {
     @Field()
     dictionaryId: string;
 }
 
-@InputType() 
-export class UpdateDictionaryParams extends DictionaryIdParams{
-    @Field({nullable:true})
+@InputType()
+export class UpdateDictionaryParams extends DictionaryIdParams {
+    @Field({ nullable: true })
     name: string;
 
-    @Field({nullable:true})
+    @Field({ nullable: true })
     description: string;
 
-    @Field(() => VisibilityType, {nullable: true})
+    @Field(() => VisibilityType, { nullable: true })
     type: VisibilityType;
 }
 
@@ -99,10 +105,10 @@ export class AddWordParams extends DictionaryIdParams {
     @Field(() => [String])
     translations: string[];
 
-    @Field(() => [String],{ defaultValue: [] })
+    @Field(() => [String], { defaultValue: [] })
     examples: string[];
 
-    @Field(() => [String],{ defaultValue: [] })
+    @Field(() => [String], { defaultValue: [] })
     tags: string[];
 }
 
@@ -113,7 +119,7 @@ export class RemoveWordParams extends DictionaryIdParams {
 }
 
 @InputType()
-export class ContributorParams extends DictionaryIdParams  {
+export class ContributorParams extends DictionaryIdParams {
     @Field()
     contributorId: string;
 }
