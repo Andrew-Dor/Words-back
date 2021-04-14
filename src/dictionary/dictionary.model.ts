@@ -111,3 +111,9 @@ export class RemoveWordParams extends DictionaryIdParams {
     @Field()
     word: string;
 }
+
+@InputType()
+export class ContributorParams extends DictionaryIdParams  {
+    @Field()
+    contributorId: string;
+}

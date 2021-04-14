@@ -1,6 +1,6 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AddWordParams, CreateDictionaryParams, Dictionary, DictionaryDocument, RemoveWordParams, UpdateDictionaryParams } from './dictionary.model';
+import { AddWordParams, ContributorParams, CreateDictionaryParams, Dictionary, DictionaryDocument, RemoveWordParams, UpdateDictionaryParams } from './dictionary.model';
 import { Model } from 'mongoose';
 import { ObjectID } from 'mongodb';
 
@@ -117,6 +117,35 @@ export class DictionaryService {
         }
 
         dictionary.words = dictionary.words.filter(w => w.word!==word);
+
+        return await dictionary.save();
+    }
+
+    async addContributor(params: ContributorParams, userId: string): Promise<Dictionary> {
+        const {dictionaryId,contributorId} = params;
+        const dictionary = await this.getDictionaryData(dictionaryId);
+
+        if (!this.isOwner(userId, dictionary.ownerId)) {
+            throw new ForbiddenException('Access denied');
+        }
+
+        if(dictionary.contributors.find(c => c === contributorId)) {
+            throw new ConflictException('This user is already a contributor of this dictionary!');
+        }
+
+        dictionary.contributors.push(contributorId);
+        return await dictionary.save();
+    }
+
+    async removeContributor(params: ContributorParams, userId: string): Promise<Dictionary> {
+        const {dictionaryId,contributorId} = params;
+        const dictionary = await this.getDictionaryData(dictionaryId);
+
+        if (!this.isOwner(userId, dictionary.ownerId)) {
+            throw new ForbiddenException('Access denied');
+        }
+
+        dictionary.contributors = dictionary.contributors.filter(c => c !== contributorId);
 
         return await dictionary.save();
     }
