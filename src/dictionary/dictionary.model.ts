@@ -90,3 +90,24 @@ export class UpdateDictionaryParams extends DictionaryIdParams{
     @Field(() => VisibilityType, {nullable: true})
     type: VisibilityType;
 }
+
+@InputType()
+export class AddWordParams extends DictionaryIdParams {
+    @Field()
+    word: string;
+
+    @Field(() => [String])
+    translations: string[];
+
+    @Field(() => [String],{ defaultValue: [] })
+    examples: string[];
+
+    @Field(() => [String],{ defaultValue: [] })
+    tags: string[];
+}
+
+@InputType()
+export class RemoveWordParams extends DictionaryIdParams {
+    @Field()
+    word: string;
+}

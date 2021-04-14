@@ -1,6 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateDictionaryParams, Dictionary, DictionaryDocument, UpdateDictionaryParams } from './dictionary.model';
+import { AddWordParams, CreateDictionaryParams, Dictionary, DictionaryDocument, RemoveWordParams, UpdateDictionaryParams } from './dictionary.model';
 import { Model } from 'mongoose';
 import { ObjectID } from 'mongodb';
 
@@ -18,7 +18,7 @@ export class DictionaryService {
         return (userId === ownerId) || contributors.includes(userId);
     }
 
-    private async getDictionaryData(id: string): Promise<Dictionary> {
+    private async getDictionaryData(id: string): Promise<DictionaryDocument> {
         const dictionary = await this.dictionaryModel.findById(id);
 
         if (!dictionary) {
@@ -82,6 +82,43 @@ export class DictionaryService {
         }
 
         return dictionary;
+    }
+
+    async addWord(params:AddWordParams, userId: string):Promise<Dictionary> {
+        const {dictionaryId,examples,tags,translations,word} = params;
+        const dictionary = await this.getDictionaryData(dictionaryId);
+        const { ownerId, contributors } = dictionary;
+
+        if (!this.hasEditRights(userId, ownerId, contributors)) {
+            throw new ForbiddenException('Access denied');
+        }
+
+        if(dictionary.words.find(w => w.word === word)) {
+            throw new ConflictException('This word has already exists in the dictionary!');
+        }
+
+        dictionary.words.push({
+            word,
+            translations,
+            examples,
+            tags
+        });
+
+        return await dictionary.save();
+    }
+
+    async removeWord(params: RemoveWordParams, userId:string):Promise<Dictionary> {
+        const {dictionaryId,word} = params;
+        const dictionary = await this.getDictionaryData(dictionaryId);
+        const { ownerId, contributors } = dictionary;
+
+        if (!this.hasEditRights(userId, ownerId, contributors)) {
+            throw new ForbiddenException('Access denied');
+        }
+
+        dictionary.words = dictionary.words.filter(w => w.word!==word);
+
+        return await dictionary.save();
     }
 
 }

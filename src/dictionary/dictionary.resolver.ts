@@ -3,7 +3,7 @@ import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
 import { ObjectID } from 'mongodb';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { GetUserId } from 'src/utils/decorators/get-user-id.decorator';
-import { CreateDictionaryParams, Dictionary, UpdateDictionaryParams } from './dictionary.model';
+import { AddWordParams, CreateDictionaryParams, Dictionary, RemoveWordParams, UpdateDictionaryParams } from './dictionary.model';
 import { DictionaryService } from './dictionary.service';
 
 @Resolver(()=>Dictionary)
@@ -49,5 +49,25 @@ export class DictionaryResolver {
         userId: string,
     ) {
         return await this.dictionaryService.getDictionaryById(id,userId);
+    }
+
+    @Mutation(() => Dictionary, {name: 'addWord'})
+    async addWord(
+        @Args('params', {type: () => AddWordParams})
+        params: AddWordParams,
+        @GetUserId()
+        userId: string,
+    ) {
+        return await this.dictionaryService.addWord(params,userId);
+    }
+
+    @Mutation(() => Dictionary, {name: 'removeWord'})
+    async removeWord(
+        @Args('params', {type: () => RemoveWordParams})
+        params: RemoveWordParams,
+        @GetUserId()
+        userId: string,
+    ) {
+        return await this.dictionaryService.removeWord(params,userId);
     }
 }
