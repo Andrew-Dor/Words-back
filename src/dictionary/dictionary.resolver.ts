@@ -20,4 +20,14 @@ export class DictionaryResolver {
     ) {
         return await this.dictionaryService.createDictionary(params, userId);
     }
+
+    @Mutation(() => Boolean, { name: 'removeDictionary' })
+    async removeDictionary(
+        @Args('id', { type: () => String })
+        id: string,
+        @GetUserId()
+        userId: string,
+    ) {
+        return await this.dictionaryService.removeDictionary(id,userId);
+    }
 }
