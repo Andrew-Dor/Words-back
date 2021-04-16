@@ -16,6 +16,7 @@ import {
 } from './dictionary.model';
 import { Model } from 'mongoose';
 import { ObjectID } from 'mongodb';
+import {DateTime} from "luxon";
 
 @Injectable()
 export class DictionaryService {
@@ -55,7 +56,7 @@ export class DictionaryService {
             ownerId: userId.toString(),
             words: [],
             contributors: [],
-            createdAt: Date.now(),
+            createdAt: DateTime.now().set({hour:0,minute:0,second:0,millisecond: 0}).toMillis()
         });
         return await newDictionary.save();
     }

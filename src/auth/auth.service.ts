@@ -12,7 +12,7 @@ import {
     UserDocument,
 } from './user.type';
 import * as bcrypt from 'bcrypt';
-import { ErrorCodes } from 'src/utils/constants';
+import { ErrorCodes } from '../utils/constants';
 import { JwtService } from '@nestjs/jwt';
 import { IJwtPayload } from './auth.types';
 import { InjectModel } from '@nestjs/mongoose';

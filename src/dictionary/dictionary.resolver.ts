@@ -1,8 +1,8 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
 import { ObjectID } from 'mongodb';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { GetUserId } from 'src/utils/decorators/get-user-id.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUserId } from '../utils/decorators/get-user-id.decorator';
 import {
     AddWordParams,
     ContributorParams,
