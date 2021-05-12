@@ -1,11 +1,12 @@
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { getModelToken } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { mockedJwtService } from "../utils/mocks/jwt.service";
+import { mockedJwtService } from '../utils/mocks/jwt.service';
 import { User } from './user.type';
 import * as bcrypt from 'bcrypt';
+import { UnauthorizedException } from '@nestjs/common';
 
 jest.mock('bcrypt');
 
@@ -14,23 +15,24 @@ function mockUserModel(dto: any) {
     this.findOne = () => {
         return this.data;
     };
-    this.create = (dto:any) => true;
+    this.create = () => true;
 }
 
 const testUser = {
-    email: "test@test.com",
-    name: "user",
-    password: "qwe123ASD*"
-}
+    email: 'test@test.com',
+    name: 'user',
+    password: 'qwe123ASD*',
+};
 
 describe('AuthService', () => {
     let service: AuthService;
     let userModel;
+    let bcryptCompare: jest.Mock;
 
     beforeEach(async () => {
+        bcryptCompare = jest.fn().mockReturnValue(true);
+        (bcrypt.compare as jest.Mock) = bcryptCompare;
         userModel = new mockUserModel(testUser);
-        const validatePasswordMock = jest.spyOn(AuthService.prototype as any, 'validatePassword');
-        validatePasswordMock.mockImplementation(() => true);
         const module: TestingModule = await Test.createTestingModule({
             imports: [
                 PassportModule.register({
@@ -46,7 +48,7 @@ describe('AuthService', () => {
                 {
                     provide: JwtService,
                     useValue: mockedJwtService,
-                }
+                },
             ],
         }).compile();
 
@@ -58,50 +60,100 @@ describe('AuthService', () => {
     });
 
     describe('When sign up user', () => {
-        it('Should call create',async () => {
-            const createSpy = jest.spyOn(userModel, "create");
+        it('Should call create', async () => {
+            const createSpy = jest.spyOn(userModel, 'create');
             try {
                 await service.signUp({
-                    email: "test@test.com",
-                    name: "user",
-                    password: "qwe123ASD*"
+                    email: 'test@test.com',
+                    name: 'user',
+                    password: 'qwe123ASD*',
                 });
                 expect(createSpy).toBeCalledTimes(1);
-            } catch(e) {
+            } catch (e) {
                 console.log(e);
             }
         });
 
         it('Should return true if success', () => {
-            expect(service.signUp({
-                email: "test@test.com",
-                name: "user",
-                password: "qwe123ASD*"
-            })).resolves.toEqual(true).catch(err => console.log(err));
+            expect(
+                service.signUp({
+                    email: 'test@test.com',
+                    name: 'user',
+                    password: 'qwe123ASD*',
+                }),
+            )
+                .resolves.toEqual(true)
+                .catch((err) => console.log(err));
         });
     });
 
-    describe('when sign in user', () => {
-        it('should attempt to validate user password', () => {
-            const singnInSpy = jest.spyOn(service, "validateUserPassword");
-            service.signIn({
-                email: "test@test.com",
-                password: "qwe123ASD*"
-            }).catch(err => console.log(err));
-            expect(singnInSpy).toBeCalledTimes(1);
+    describe('When sign in right user', () => {
+        beforeEach(() => {
+            bcryptCompare.mockReturnValue(true);
         });
 
-        it('should call findOne',async ()=>{
-            const findOneSpy = jest.spyOn(userModel, "findOne");
-            try{
+        it('should attempt to validate user password', () => {
+            const signInSpy = jest.spyOn(service, 'validateUserPassword');
+            service
+                .signIn({
+                    email: 'test@test.com',
+                    password: 'qwe123ASD*',
+                })
+                .catch((err) => console.log(err));
+            expect(signInSpy).toBeCalledTimes(1);
+        });
+
+        it('should call findOne', async () => {
+            const findOneSpy = jest.spyOn(userModel, 'findOne');
+            try {
                 await service.signIn({
-                    email: "test@test.com",
-                    password: "qwe123ASD*"
+                    email: 'test@test.com',
+                    password: 'qwe123ASD*',
                 });
                 expect(findOneSpy).toBeCalledTimes(1);
-            } catch(e){
+            } catch (e) {
                 console.log(e);
             }
-        })
+        });
+
+        it('should return user name', async () => {
+            expect(
+                service.validateUserPassword({
+                    email: 'test@test.com',
+                    password: 'qwe123ASD*',
+                }),
+            ).resolves.toEqual('user');
+        });
+    });
+
+    describe('When validate wrong user password', () => {
+        beforeEach(() => {
+            bcryptCompare.mockReturnValue(false);
+        });
+
+        it('should return null', async () => {
+            expect(
+                service.validateUserPassword({
+                    email: 'test@test.com',
+                    password: 'qwe123ASD*',
+                }),
+            ).resolves.toEqual(null);
+        });
+
+        it('should throw unauthorized exception', async () => {
+            expect.assertions(2);
+            try {
+                await service.signIn({
+                    email: 'test@test.com',
+                    password: 'wrongpassword',
+                });
+            } catch (error) {
+                expect(error).toBeInstanceOf(UnauthorizedException);
+                expect(error).toHaveProperty(
+                    'message',
+                    'Invalid email or password',
+                );
+            }
+        });
     });
 });
