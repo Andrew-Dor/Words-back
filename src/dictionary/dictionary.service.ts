@@ -49,7 +49,7 @@ export class DictionaryService {
 
     async createDictionary(params: CreateDictionaryParams, userId: ObjectID) {
         const { name, description, type } = params;
-        const newDictionary = new this.dictionaryModel({
+        return await this.dictionaryModel.create({
             name,
             description,
             type,
@@ -58,7 +58,6 @@ export class DictionaryService {
             contributors: [],
             createdAt: DateTime.now().set({hour:0,minute:0,second:0,millisecond: 0}).toMillis()
         });
-        return await newDictionary.save();
     }
 
     async removeDictionary(id: string, userId: string): Promise<boolean> {
