@@ -12,7 +12,7 @@ import {
     UserDocument,
 } from './user.type';
 import * as bcrypt from 'bcrypt';
-import { ErrorCodes } from 'src/utils/constants';
+import { ErrorCodes } from '../utils/constants';
 import { JwtService } from '@nestjs/jwt';
 import { IJwtPayload } from './auth.types';
 import { InjectModel } from '@nestjs/mongoose';
@@ -40,14 +40,13 @@ export class AuthService {
     async signUp(params: CreateUserParams): Promise<boolean> {
         const { email, name, password } = params;
         const hashedPassword = await this.hashPassword(password);
-        const newUser = new this.userModel({
-            email,
-            name,
-            password: hashedPassword,
-        });
 
         try {
-            await newUser.save();
+            const newUser = await this.userModel.create({
+                email,
+                name,
+                password: hashedPassword,
+            });
             return true;
         } catch (error) {
             if (error.code === ErrorCodes.DUPLICATE_USER) {

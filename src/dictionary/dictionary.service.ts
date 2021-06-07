@@ -16,6 +16,7 @@ import {
 } from './dictionary.model';
 import { Model } from 'mongoose';
 import { ObjectID } from 'mongodb';
+import {DateTime} from "luxon";
 
 @Injectable()
 export class DictionaryService {
@@ -48,16 +49,15 @@ export class DictionaryService {
 
     async createDictionary(params: CreateDictionaryParams, userId: ObjectID) {
         const { name, description, type } = params;
-        const newDictionary = new this.dictionaryModel({
+        return await this.dictionaryModel.create({
             name,
             description,
             type,
             ownerId: userId.toString(),
             words: [],
             contributors: [],
-            createdAt: Date.now(),
+            createdAt: DateTime.now().set({hour:0,minute:0,second:0,millisecond: 0}).toMillis()
         });
-        return await newDictionary.save();
     }
 
     async removeDictionary(id: string, userId: string): Promise<boolean> {

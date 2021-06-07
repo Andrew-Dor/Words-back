@@ -8,7 +8,7 @@ import {
 } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { VisibilityType } from 'src/utils/constants';
+import { VisibilityType } from "../utils/constants";
 
 registerEnumType(VisibilityType, {
     name: 'VisibilityType',
